@@ -1,13 +1,15 @@
 export interface Transaction {
   id: string;
   merchantName: string;
-  merchantLogo: string;
   date: string;
   amount: number;
   pointsEarned: number;
   category: 'food' | 'shopping' | 'grocery' | 'entertainment' | 'travel' | 'other';
   status: 'completed' | 'pending';
   receiptNumber: string;
+  subtotal: number;
+  tax: number;
+  paymentMethod: 'credit_card' | 'debit_card' | 'e_wallet' | 'cash';
   items?: TransactionItem[];
 }
 

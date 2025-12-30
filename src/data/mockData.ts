@@ -1,4 +1,5 @@
 import { Transaction, UserProfile, PointsHistory } from '@/types/loyalty';
+import { Coffee, ShoppingBag, ShoppingCart, Film, BookOpen, UtensilsCrossed, CreditCard, Wallet, Banknote } from 'lucide-react';
 
 export const mockUser: UserProfile = {
   id: 'user-001',
@@ -12,17 +13,44 @@ export const mockUser: UserProfile = {
   qrCode: 'LOYALTY-USER-001-2024',
 };
 
+export const categoryIcons = {
+  food: UtensilsCrossed,
+  shopping: ShoppingBag,
+  grocery: ShoppingCart,
+  entertainment: Film,
+  travel: BookOpen,
+  other: ShoppingBag,
+};
+
+export const merchantIcons: Record<string, typeof Coffee> = {
+  'Coffee Bean': Coffee,
+  'Grocery Mart': ShoppingCart,
+  'Fashion Store': ShoppingBag,
+  'Cinema XXI': Film,
+  'Bookstore': BookOpen,
+  'Restaurant Padang': UtensilsCrossed,
+};
+
+export const paymentMethods = {
+  credit_card: { label: 'Credit Card', icon: CreditCard },
+  debit_card: { label: 'Debit Card', icon: CreditCard },
+  e_wallet: { label: 'E-Wallet', icon: Wallet },
+  cash: { label: 'Cash', icon: Banknote },
+};
+
 export const mockTransactions: Transaction[] = [
   {
     id: 'txn-001',
     merchantName: 'Coffee Bean',
-    merchantLogo: '☕',
     date: '2025-07-03',
     amount: 45000,
     pointsEarned: 25,
     category: 'food',
     status: 'completed',
     receiptNumber: 'RCP-2025-0703-001',
+    subtotal: 40000,
+    tax: 5000,
+    paymentMethod: 'e_wallet',
     items: [
       { name: 'Caramel Latte', quantity: 1, price: 35000, pointsEarned: 18 },
       { name: 'Croissant', quantity: 1, price: 10000, pointsEarned: 7 },
@@ -31,13 +59,15 @@ export const mockTransactions: Transaction[] = [
   {
     id: 'txn-002',
     merchantName: 'Grocery Mart',
-    merchantLogo: '🛒',
     date: '2025-07-03',
     amount: 250000,
     pointsEarned: 25,
     category: 'grocery',
     status: 'completed',
     receiptNumber: 'RCP-2025-0703-002',
+    subtotal: 227273,
+    tax: 22727,
+    paymentMethod: 'debit_card',
     items: [
       { name: 'Fresh Milk 1L', quantity: 2, price: 28000, pointsEarned: 5 },
       { name: 'Organic Eggs', quantity: 1, price: 45000, pointsEarned: 8 },
@@ -48,13 +78,15 @@ export const mockTransactions: Transaction[] = [
   {
     id: 'txn-003',
     merchantName: 'Fashion Store',
-    merchantLogo: '👕',
     date: '2025-07-02',
     amount: 450000,
     pointsEarned: 45,
     category: 'shopping',
     status: 'completed',
     receiptNumber: 'RCP-2025-0702-001',
+    subtotal: 409091,
+    tax: 40909,
+    paymentMethod: 'credit_card',
     items: [
       { name: 'Cotton T-Shirt', quantity: 2, price: 200000, pointsEarned: 20 },
       { name: 'Denim Jeans', quantity: 1, price: 250000, pointsEarned: 25 },
@@ -63,13 +95,15 @@ export const mockTransactions: Transaction[] = [
   {
     id: 'txn-004',
     merchantName: 'Cinema XXI',
-    merchantLogo: '🎬',
     date: '2025-07-01',
     amount: 150000,
     pointsEarned: 30,
     category: 'entertainment',
     status: 'completed',
     receiptNumber: 'RCP-2025-0701-001',
+    subtotal: 136364,
+    tax: 13636,
+    paymentMethod: 'e_wallet',
     items: [
       { name: 'Movie Ticket', quantity: 2, price: 100000, pointsEarned: 20 },
       { name: 'Popcorn Combo', quantity: 1, price: 50000, pointsEarned: 10 },
@@ -78,13 +112,15 @@ export const mockTransactions: Transaction[] = [
   {
     id: 'txn-005',
     merchantName: 'Bookstore',
-    merchantLogo: '📚',
     date: '2025-06-30',
     amount: 175000,
     pointsEarned: 35,
     category: 'shopping',
     status: 'completed',
     receiptNumber: 'RCP-2025-0630-001',
+    subtotal: 159091,
+    tax: 15909,
+    paymentMethod: 'debit_card',
     items: [
       { name: 'Best Seller Novel', quantity: 1, price: 95000, pointsEarned: 19 },
       { name: 'Notebook Set', quantity: 2, price: 80000, pointsEarned: 16 },
@@ -93,13 +129,15 @@ export const mockTransactions: Transaction[] = [
   {
     id: 'txn-006',
     merchantName: 'Restaurant Padang',
-    merchantLogo: '🍛',
     date: '2025-06-29',
     amount: 85000,
     pointsEarned: 17,
     category: 'food',
     status: 'completed',
     receiptNumber: 'RCP-2025-0629-001',
+    subtotal: 77273,
+    tax: 7727,
+    paymentMethod: 'cash',
     items: [
       { name: 'Rendang Rice', quantity: 1, price: 45000, pointsEarned: 9 },
       { name: 'Iced Tea', quantity: 2, price: 20000, pointsEarned: 4 },

@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 import { Transaction } from '@/types/loyalty';
-import { formatDate, formatCurrency, getCategoryColor } from '@/data/mockData';
+import { formatDate, formatCurrency, getCategoryColor, merchantIcons, categoryIcons } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
 interface TransactionCardProps {
@@ -9,16 +9,18 @@ interface TransactionCardProps {
 }
 
 const TransactionCard = ({ transaction, onClick }: TransactionCardProps) => {
+  const MerchantIcon = merchantIcons[transaction.merchantName] || categoryIcons[transaction.category];
+
   return (
     <button
       onClick={onClick}
       className="w-full flex items-center gap-3 p-3 bg-card rounded-xl shadow-card hover:shadow-float transition-all duration-200 active:scale-[0.98] animate-fade-in"
     >
       <div className={cn(
-        'w-12 h-12 rounded-xl flex items-center justify-center text-2xl',
+        'w-12 h-12 rounded-xl flex items-center justify-center',
         getCategoryColor(transaction.category)
       )}>
-        {transaction.merchantLogo}
+        <MerchantIcon className="w-6 h-6" />
       </div>
       
       <div className="flex-1 text-left">
