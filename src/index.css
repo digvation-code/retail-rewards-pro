@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,79 +6,83 @@
 
 @layer base {
   :root {
-    --background: 30 50% 98%;
-    --foreground: 20 20% 15%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 20 20% 15%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 20% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 24 95% 53%;
+    --primary: 213 94% 56%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 30% 94%;
-    --secondary-foreground: 20 20% 25%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 20%;
 
-    --muted: 30 20% 92%;
-    --muted-foreground: 20 10% 45%;
+    --muted: 210 40% 94%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 24 100% 95%;
-    --accent-foreground: 24 95% 40%;
+    --accent: 213 100% 96%;
+    --accent-foreground: 213 94% 45%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 20% 88%;
-    --input: 30 20% 88%;
-    --ring: 24 95% 53%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 213 94% 56%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
     
-    --points: 45 100% 50%;
-    --points-foreground: 45 100% 20%;
+    --points: 213 94% 56%;
+    --points-foreground: 0 0% 100%;
 
-    --gradient-warm: linear-gradient(135deg, hsl(24 95% 53%) 0%, hsl(35 100% 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(30 50% 99%) 0%, hsl(30 40% 96%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(24 95% 53%) 0%, hsl(15 90% 50%) 100%);
+    --nav-active: 142 70% 45%;
 
-    --shadow-card: 0 4px 20px -4px hsl(24 30% 50% / 0.12);
-    --shadow-button: 0 4px 14px -2px hsl(24 95% 53% / 0.4);
-    --shadow-float: 0 8px 30px -6px hsl(24 30% 40% / 0.2);
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 56%) 0%, hsl(213 94% 65%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(213 94% 96%) 0%, hsl(210 40% 98%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(213 94% 56%) 0%, hsl(220 90% 60%) 100%);
+
+    --shadow-card: 0 2px 12px -2px hsl(213 30% 50% / 0.1);
+    --shadow-button: 0 4px 14px -2px hsl(142 70% 45% / 0.4);
+    --shadow-float: 0 8px 30px -6px hsl(213 30% 40% / 0.15);
+    --shadow-nav: 0 -2px 20px 0 hsl(213 30% 50% / 0.08);
   }
 
   .dark {
-    --background: 20 20% 8%;
-    --foreground: 30 20% 95%;
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
 
-    --card: 20 15% 12%;
-    --card-foreground: 30 20% 95%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 20 15% 12%;
-    --popover-foreground: 30 20% 95%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 24 95% 55%;
+    --primary: 213 94% 56%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 20 15% 18%;
-    --secondary-foreground: 30 20% 90%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 20 15% 20%;
-    --muted-foreground: 30 10% 60%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 24 50% 20%;
-    --accent-foreground: 24 95% 70%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 213 94% 70%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 20 15% 20%;
-    --input: 20 15% 20%;
-    --ring: 24 95% 55%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 213 94% 56%;
   }
 }
 
@@ -89,13 +93,17 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 }
 
 @layer utilities {
   .gradient-warm {
     background: var(--gradient-warm);
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
   }
   
   .gradient-hero {
@@ -114,7 +122,20 @@
     box-shadow: var(--shadow-float);
   }
 
+  .shadow-nav {
+    box-shadow: var(--shadow-nav);
+  }
+
   .safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

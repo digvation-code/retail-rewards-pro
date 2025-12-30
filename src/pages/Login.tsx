@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gift, Loader2 } from 'lucide-react';
+import { Award, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
@@ -27,7 +27,6 @@ const Login = () => {
     e.preventDefault();
     setErrors({});
 
-    // Validate input
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
       const fieldErrors: { email?: string; password?: string } = {};
@@ -57,21 +56,21 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-warm flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-0 shadow-elegant">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
-            <Gift className="w-8 h-8 text-primary-foreground" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border border-border shadow-float">
+        <CardHeader className="text-center space-y-4 pb-2">
+          <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+            <Award className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-display text-foreground">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Welcome Back</CardTitle>
           <CardDescription className="text-muted-foreground">
             Sign in to access your loyalty rewards
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -85,7 +84,7 @@ const Login = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -100,7 +99,7 @@ const Login = () => {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11"
               disabled={isLoading}
             >
               {isLoading ? (

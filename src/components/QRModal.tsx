@@ -1,4 +1,4 @@
-import { X, Copy, Check } from 'lucide-react';
+import { Copy, Check, Award } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -21,8 +21,8 @@ const QRModal = ({ isOpen, onClose }: QRModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto rounded-2xl p-0 overflow-hidden border-0">
-        <div className="gradient-warm p-6 text-center">
+      <DialogContent className="max-w-sm mx-auto rounded-2xl p-0 overflow-hidden border border-border">
+        <div className="bg-gradient-hero p-6 text-center">
           <DialogHeader>
             <DialogTitle className="text-primary-foreground text-xl font-bold">
               Your Loyalty QR Code
@@ -33,13 +33,13 @@ const QRModal = ({ isOpen, onClose }: QRModalProps) => {
           </p>
         </div>
         
-        <div className="p-6 flex flex-col items-center gap-4">
-          <div className="bg-card p-4 rounded-2xl shadow-card">
+        <div className="p-6 flex flex-col items-center gap-4 bg-card">
+          <div className="bg-white p-4 rounded-2xl shadow-card border border-border">
             <QRCode
               value={mockUser.qrCode}
-              size={200}
-              bgColor="hsl(0, 0%, 100%)"
-              fgColor="hsl(24, 95%, 53%)"
+              size={180}
+              bgColor="#ffffff"
+              fgColor="hsl(213, 94%, 56%)"
               level="H"
             />
           </div>
@@ -62,13 +62,14 @@ const QRModal = ({ isOpen, onClose }: QRModalProps) => {
             </Button>
           </div>
           
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Member: <span className="font-semibold text-foreground">{mockUser.name}</span>
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {mockUser.membershipTier} Member
-            </p>
+          <div className="flex items-center gap-2 text-center">
+            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+              <Award className="w-4 h-4 text-primary" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-medium text-foreground">{mockUser.name}</p>
+              <p className="text-xs text-muted-foreground">{mockUser.membershipTier} Member</p>
+            </div>
           </div>
         </div>
       </DialogContent>
