@@ -1,12 +1,28 @@
-import { ArrowLeft, ChevronRight, Crown, Mail, Phone, Calendar, Settings, HelpCircle, LogOut, Gift, Star } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Crown, Mail, Phone, Calendar, Settings, HelpCircle, LogOut, Gift, Star, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { mockUser, mockPointsHistory, formatDate } from '@/data/mockData';
+import { mockUser, formatDate } from '@/data/mockData';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const progressPercentage = ((mockUser.totalPoints) / (mockUser.totalPoints + mockUser.pointsToNextTier)) * 100;
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been signed out successfully.",
+    });
+    navigate('/login');
+  };
 
   const menuItems = [
     { icon: Gift, label: 'My Rewards', description: 'View redeemed rewards' },
@@ -122,9 +138,17 @@ const Profile = () => {
 
       {/* Logout */}
       <section className="px-4 mt-4">
-        <button className="w-full flex items-center gap-3 p-4 bg-destructive/10 rounded-xl text-destructive hover:bg-destructive/20 transition-colors">
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Sign Out</span>
+        <button 
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="w-full flex items-center gap-3 p-4 bg-destructive/10 rounded-xl text-destructive hover:bg-destructive/20 transition-colors disabled:opacity-50"
+        >
+          {isLoggingOut ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <LogOut className="w-5 h-5" />
+          )}
+          <span className="font-medium">{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
         </button>
       </section>
     </div>
