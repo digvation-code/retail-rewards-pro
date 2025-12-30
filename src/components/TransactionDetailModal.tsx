@@ -1,7 +1,7 @@
-import { X, MapPin, Clock, Receipt, CheckCircle } from 'lucide-react';
+import { Clock, Receipt, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Transaction } from '@/types/loyalty';
-import { formatDate, formatCurrency, getCategoryColor } from '@/data/mockData';
+import { formatDate, formatCurrency, getCategoryColor, merchantIcons, categoryIcons, paymentMethods } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
@@ -14,16 +14,18 @@ interface TransactionDetailModalProps {
 const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDetailModalProps) => {
   if (!transaction) return null;
 
+  const MerchantIcon = merchantIcons[transaction.merchantName] || categoryIcons[transaction.category];
+  const PaymentIcon = paymentMethods[transaction.paymentMethod].icon;
+  const paymentLabel = paymentMethods[transaction.paymentMethod].label;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto rounded-2xl p-0 overflow-hidden border-0 max-h-[85vh] overflow-y-auto">
         <div className="gradient-warm p-6">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <div className={cn(
-                'w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-primary-foreground/20'
-              )}>
-                {transaction.merchantLogo}
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-primary-foreground/20">
+                <MerchantIcon className="w-7 h-7 text-primary-foreground" />
               </div>
               <div className="text-left">
                 <DialogTitle className="text-primary-foreground text-xl font-bold">
@@ -98,10 +100,34 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
 
           <Separator />
 
-          {/* Total */}
-          <div className="flex items-center justify-between text-lg font-bold">
-            <span>Total</span>
-            <span className="text-primary">{formatCurrency(transaction.amount)}</span>
+          {/* Payment Details */}
+          <div>
+            <h4 className="font-semibold mb-3">Payment Details</h4>
+            <div className="bg-muted rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-medium">{formatCurrency(transaction.subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Tax (10%)</span>
+                <span className="font-medium">{formatCurrency(transaction.tax)}</span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">Total</span>
+                <span className="text-lg font-bold text-primary">{formatCurrency(transaction.amount)}</span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-sm">Payment Method</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center shadow-sm">
+                    <PaymentIcon className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-sm">{paymentLabel}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </DialogContent>
