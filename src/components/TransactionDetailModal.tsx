@@ -20,15 +20,15 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto rounded-2xl p-0 overflow-hidden border-0 max-h-[85vh] overflow-y-auto">
-        <div className="gradient-warm p-6">
+      <DialogContent className="max-w-sm mx-auto rounded-2xl p-0 overflow-hidden border border-border max-h-[85vh] overflow-y-auto">
+        <div className="bg-gradient-hero p-6">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-primary-foreground/20">
-                <MerchantIcon className="w-7 h-7 text-primary-foreground" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary-foreground/20">
+                <MerchantIcon className="w-6 h-6 text-primary-foreground" />
               </div>
               <div className="text-left">
-                <DialogTitle className="text-primary-foreground text-xl font-bold">
+                <DialogTitle className="text-primary-foreground text-lg font-semibold">
                   {transaction.merchantName}
                 </DialogTitle>
                 <p className="text-primary-foreground/80 text-sm">{formatDate(transaction.date)}</p>
@@ -37,12 +37,12 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
           </DialogHeader>
         </div>
 
-        <div className="p-5 space-y-5">
+        <div className="p-5 space-y-5 bg-card">
           {/* Status Badge */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-success">
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-medium capitalize">{transaction.status}</span>
+              <CheckCircle className="w-4 h-4" />
+              <span className="font-medium capitalize text-sm">{transaction.status}</span>
             </div>
             <span className={cn(
               'px-3 py-1 rounded-full text-xs font-medium capitalize',
@@ -53,22 +53,30 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
           </div>
 
           {/* Points Earned Highlight */}
-          <div className="bg-accent rounded-xl p-4 text-center">
-            <p className="text-sm text-accent-foreground/70">Points Earned</p>
-            <p className="text-3xl font-bold text-primary">+{transaction.pointsEarned} pts</p>
+          <div className="bg-accent rounded-xl p-4 text-center border border-border">
+            <p className="text-xs text-muted-foreground">Points Earned</p>
+            <p className="text-2xl font-bold text-primary">+{transaction.pointsEarned} pts</p>
           </div>
 
           {/* Transaction Details */}
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
-              <Receipt className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Receipt:</span>
-              <span className="font-medium">{transaction.receiptNumber}</span>
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                <Receipt className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Receipt</p>
+                <p className="font-medium text-sm">{transaction.receiptNumber}</p>
+              </div>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Date:</span>
-              <span className="font-medium">{formatDate(transaction.date)}</span>
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Date</p>
+                <p className="font-medium text-sm">{formatDate(transaction.date)}</p>
+              </div>
             </div>
           </div>
 
@@ -77,8 +85,8 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
           {/* Items List */}
           {transaction.items && transaction.items.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-3">Items Purchased</h4>
-              <div className="space-y-3">
+              <h4 className="font-semibold text-sm mb-3">Items Purchased</h4>
+              <div className="space-y-2">
                 {transaction.items.map((item, index) => (
                   <div 
                     key={index} 
@@ -102,7 +110,7 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
 
           {/* Payment Details */}
           <div>
-            <h4 className="font-semibold mb-3">Payment Details</h4>
+            <h4 className="font-semibold text-sm mb-3">Payment Details</h4>
             <div className="bg-muted rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
@@ -114,14 +122,14 @@ const TransactionDetailModal = ({ transaction, isOpen, onClose }: TransactionDet
               </div>
               <Separator />
               <div className="flex items-center justify-between">
-                <span className="font-semibold">Total</span>
+                <span className="font-semibold text-sm">Total</span>
                 <span className="text-lg font-bold text-primary">{formatCurrency(transaction.amount)}</span>
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">Payment Method</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-card border border-border flex items-center justify-center">
                     <PaymentIcon className="w-4 h-4 text-primary" />
                   </div>
                   <span className="font-medium text-sm">{paymentLabel}</span>

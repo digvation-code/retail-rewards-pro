@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -58,13 +58,15 @@ export default {
           DEFAULT: "hsl(var(--points))",
           foreground: "hsl(var(--points-foreground))",
         },
+        "nav-active": "hsl(var(--nav-active))",
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 8px)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
         xl: "calc(var(--radius) + 4px)",
         "2xl": "calc(var(--radius) + 8px)",
+        "3xl": "1.5rem",
       },
       keyframes: {
         "accordion-down": {
@@ -88,8 +90,8 @@ export default {
           to: { opacity: "1", transform: "scale(1)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0.4)" },
-          "50%": { boxShadow: "0 0 0 12px hsl(var(--primary) / 0)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(142 70% 45% / 0.4)" },
+          "50%": { boxShadow: "0 0 0 8px hsl(142 70% 45% / 0)" },
         },
       },
       animation: {
