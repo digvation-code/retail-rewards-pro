@@ -157,12 +157,12 @@ export const mockPointsHistory: PointsHistory[] = [
 
 export const getCategoryColor = (category: Transaction['category']) => {
   const colors = {
-    food: 'bg-amber-50 text-amber-600',
-    shopping: 'bg-rose-50 text-rose-600',
-    grocery: 'bg-emerald-50 text-emerald-600',
-    entertainment: 'bg-violet-50 text-violet-600',
-    travel: 'bg-sky-50 text-sky-600',
-    other: 'bg-slate-50 text-slate-600',
+    food: 'bg-orange-50 text-orange-500',
+    shopping: 'bg-pink-50 text-pink-500',
+    grocery: 'bg-emerald-50 text-emerald-500',
+    entertainment: 'bg-violet-50 text-violet-500',
+    travel: 'bg-sky-50 text-sky-500',
+    other: 'bg-slate-50 text-slate-500',
   };
   return colors[category];
 };

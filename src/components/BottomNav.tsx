@@ -1,4 +1,4 @@
-import { Home, Building2, MessageCircle, User, Plus } from 'lucide-react';
+import { Home, Receipt, ShoppingBag, User, Plus } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -11,12 +11,12 @@ const BottomNav = ({ onQrClick }: BottomNavProps) => {
   const navigate = useNavigate();
 
   const leftNavItems = [
-    { icon: Home, label: 'Explore', path: '/' },
-    { icon: Building2, label: 'Stays', path: '/transactions' },
+    { icon: Home, label: 'Home', path: '/' },
+    { icon: Receipt, label: 'History', path: '/transactions' },
   ];
 
   const rightNavItems = [
-    { icon: MessageCircle, label: 'Chat', path: '/chat' },
+    { icon: ShoppingBag, label: 'Catalog', path: '/chat' },
     { icon: User, label: 'Profile', path: '/profile' },
   ];
 
