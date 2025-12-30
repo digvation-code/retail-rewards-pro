@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
 import Profile from "./pages/Profile";
+import Catalog from "./pages/Catalog";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
@@ -40,6 +41,11 @@ const AppContent = () => {
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/chat" element={
+          <ProtectedRoute>
+            <Catalog />
           </ProtectedRoute>
         } />
         <Route path="*" element={<NotFound />} />
