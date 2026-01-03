@@ -2,15 +2,26 @@ import { useState } from 'react';
 import { ChevronRight, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PointsCard from '@/components/PointsCard';
-import TransactionCard from '@/components/TransactionCard';
-import TransactionDetailModal from '@/components/TransactionDetailModal';
-import { mockTransactions, mockUser } from '@/data/mockData';
-import { Transaction } from '@/types/loyalty';
+import { useProfile } from '@/hooks/useProfile';
+import { useTransactions } from '@/hooks/useTransactions';
+import { formatDistanceToNow } from 'date-fns';
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const recentTransactions = mockTransactions.slice(0, 3);
+  const { profile, loading: profileLoading } = useProfile();
+  const { transactions, loading: transactionsLoading } = useTransactions();
+
+  const recentTransactions = transactions.slice(0, 3);
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  const userName = profile?.full_name?.split(' ')[0] || 'User';
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -19,7 +30,7 @@ const Index = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-muted-foreground text-sm">Welcome back,</p>
-            <h1 className="text-xl font-bold text-foreground">{mockUser.name.split(' ')[0]}</h1>
+            <h1 className="text-xl font-bold text-foreground">{userName}</h1>
           </div>
           <div className="flex items-center gap-3">
             <button className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center shadow-card">
@@ -29,27 +40,27 @@ const Index = () => {
               onClick={() => navigate('/profile')}
               className="w-10 h-10 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center text-sm font-semibold text-primary"
             >
-              {mockUser.name.charAt(0)}
+              {userName.charAt(0)}
             </button>
           </div>
         </div>
         
-        <PointsCard />
+        <PointsCard points={profile?.points_balance || 0} />
       </header>
 
       {/* Stats Grid */}
       <section className="px-4 mt-4">
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-card rounded-xl p-4 border border-border shadow-card text-center">
-            <p className="text-2xl font-bold text-foreground">12</p>
+            <p className="text-2xl font-bold text-foreground">{transactions.filter(t => t.type === 'earn').length}</p>
             <p className="text-xs text-muted-foreground mt-1">Visits</p>
           </div>
           <div className="bg-card rounded-xl p-4 border border-border shadow-card text-center">
-            <p className="text-2xl font-bold text-foreground">28</p>
-            <p className="text-xs text-muted-foreground mt-1">Days</p>
+            <p className="text-2xl font-bold text-foreground">{transactions.length}</p>
+            <p className="text-xs text-muted-foreground mt-1">Trans</p>
           </div>
           <div className="bg-card rounded-xl p-4 border border-border shadow-card text-center">
-            <p className="text-2xl font-bold text-primary">{mockUser.totalPoints.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-primary">{(profile?.points_balance || 0).toLocaleString()}</p>
             <p className="text-xs text-muted-foreground mt-1">Points</p>
           </div>
         </div>
@@ -58,7 +69,10 @@ const Index = () => {
       {/* Quick Actions */}
       <section className="px-4 mt-6">
         <div className="grid grid-cols-2 gap-3">
-          <button className="bg-card rounded-xl p-4 border border-border shadow-card flex items-center gap-3 hover:bg-accent transition-colors">
+          <button 
+            onClick={() => navigate('/catalog')}
+            className="bg-card rounded-xl p-4 border border-border shadow-card flex items-center gap-3 hover:bg-accent transition-colors"
+          >
             <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
               <span className="text-lg">🎁</span>
             </div>
@@ -92,25 +106,41 @@ const Index = () => {
         </div>
         
         <div className="space-y-3">
-          {recentTransactions.map((transaction, index) => (
-            <div 
-              key={transaction.id}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <TransactionCard 
-                transaction={transaction}
-                onClick={() => setSelectedTransaction(transaction)}
-              />
+          {recentTransactions.length > 0 ? (
+            recentTransactions.map((transaction) => (
+              <div 
+                key={transaction.id}
+                className="bg-card rounded-xl p-4 border border-border shadow-card"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      transaction.type === 'earn' ? 'bg-success/10' : 'bg-destructive/10'
+                    }`}>
+                      <span className="text-lg">{transaction.type === 'earn' ? '💰' : '🎁'}</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{transaction.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(transaction.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                  <p className={`font-bold text-sm ${
+                    transaction.type === 'earn' ? 'text-success' : 'text-destructive'
+                  }`}>
+                    {transaction.type === 'earn' ? '+' : ''}{transaction.points} pts
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-10 bg-card rounded-xl border border-border">
+              <p className="text-muted-foreground text-sm">No transactions yet</p>
             </div>
-          ))}
+          )}
         </div>
       </section>
-
-      <TransactionDetailModal
-        transaction={selectedTransaction}
-        isOpen={!!selectedTransaction}
-        onClose={() => setSelectedTransaction(null)}
-      />
     </div>
   );
 };

@@ -1,93 +1,114 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
-    // Create admin client with service role key
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
+        persistSession: false
+      }
+    })
 
-    const testEmail = 'test@example.com';
-    const testPassword = 'test123456';
+    // Test user credentials
+    const testUserEmail = 'test@example.com'
+    const testUserPassword = 'test123456'
+    
+    // Cashier user credentials
+    const cashierEmail = 'cashier@example.com'
+    const cashierPassword = 'cashier123456'
 
-    // Check if user already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const userExists = existingUsers?.users?.some(user => user.email === testEmail);
+    // First check if test user already exists
+    const { data: existingUsers } = await supabase.auth.admin.listUsers()
+    const testUserExists = existingUsers?.users?.some(u => u.email === testUserEmail)
+    const cashierExists = existingUsers?.users?.some(u => u.email === cashierEmail)
 
-    if (userExists) {
-      console.log('Test user already exists');
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Test user already exists',
-          credentials: {
-            email: testEmail,
-            password: testPassword,
-          },
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      );
+    let testUserId = null
+    let cashierUserId = null
+
+    // Create test user if not exists
+    if (!testUserExists) {
+      console.log('Creating test user...')
+      const { data: userData, error: createError } = await supabase.auth.admin.createUser({
+        email: testUserEmail,
+        password: testUserPassword,
+        email_confirm: true,
+        user_metadata: { full_name: 'Test User' }
+      })
+
+      if (createError) {
+        console.log('Error creating test user:', createError.message)
+      } else {
+        testUserId = userData.user.id
+        console.log('Test user created:', testUserId)
+        
+        // Assign user role
+        await supabase.from('user_roles').insert({ user_id: testUserId, role: 'user' })
+        
+        // Add some initial points
+        await supabase.from('profiles').update({ points_balance: 2500, must_change_password: false }).eq('user_id', testUserId)
+      }
+    } else {
+      const existingUser = existingUsers?.users?.find(u => u.email === testUserEmail)
+      testUserId = existingUser?.id
+      console.log('Test user already exists:', testUserId)
     }
 
-    // Create test user
-    const { data: user, error } = await supabaseAdmin.auth.admin.createUser({
-      email: testEmail,
-      password: testPassword,
-      email_confirm: true,
-    });
+    // Create cashier if not exists
+    if (!cashierExists) {
+      console.log('Creating cashier user...')
+      const { data: cashierData, error: cashierError } = await supabase.auth.admin.createUser({
+        email: cashierEmail,
+        password: cashierPassword,
+        email_confirm: true,
+        user_metadata: { full_name: 'Cashier User' }
+      })
 
-    if (error) {
-      console.error('Error creating test user:', error);
-      throw error;
+      if (cashierError) {
+        console.log('Error creating cashier:', cashierError.message)
+      } else {
+        cashierUserId = cashierData.user.id
+        console.log('Cashier created:', cashierUserId)
+        
+        // Assign cashier role
+        await supabase.from('user_roles').insert({ user_id: cashierUserId, role: 'cashier' })
+        
+        // Mark password as not needing change
+        await supabase.from('profiles').update({ must_change_password: false }).eq('user_id', cashierUserId)
+      }
+    } else {
+      const existingCashier = existingUsers?.users?.find(u => u.email === cashierEmail)
+      cashierUserId = existingCashier?.id
+      console.log('Cashier already exists:', cashierUserId)
     }
-
-    console.log('Test user created successfully:', user.user?.id);
 
     return new Response(
-      JSON.stringify({
+      JSON.stringify({ 
         success: true,
-        message: 'Test user created successfully',
-        credentials: {
-          email: testEmail,
-          password: testPassword,
-        },
+        message: 'Test users ready',
+        testUser: { email: testUserEmail, password: testUserPassword },
+        cashier: { email: cashierEmail, password: cashierPassword }
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    console.error('Error:', errorMessage);
+    console.error('Error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: errorMessage,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    );
+      JSON.stringify({ error: message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
-});
+})

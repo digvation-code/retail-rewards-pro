@@ -1,8 +1,9 @@
-import { ArrowLeft, ChevronRight, Award, Mail, Phone, Calendar, Settings, HelpCircle, LogOut, Gift, Star, Loader2, Bell, Shield, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, LogOut, Gift, Star, Loader2, Bell, Shield, CheckCircle2, Settings, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { mockUser, formatDate } from '@/data/mockData';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
+import { useTransactions } from '@/hooks/useTransactions';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
@@ -10,10 +11,22 @@ import { Switch } from '@/components/ui/switch';
 const Profile = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { profile, loading } = useProfile();
+  const { transactions } = useTransactions();
   const { toast } = useToast();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [notifications, setNotifications] = useState(true);
-  const progressPercentage = ((mockUser.totalPoints) / (mockUser.totalPoints + mockUser.pointsToNextTier)) * 100;
+
+  const points = profile?.points_balance || 0;
+  const nextTierPoints = 5000;
+  const progressPercentage = Math.min(100, (points / nextTierPoints) * 100);
+
+  const getTier = (pts: number) => {
+    if (pts >= 10000) return 'Platinum';
+    if (pts >= 5000) return 'Gold';
+    if (pts >= 2000) return 'Silver';
+    return 'Bronze';
+  };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -32,6 +45,16 @@ const Profile = () => {
     { icon: HelpCircle, label: 'Preferences', description: 'App settings' },
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  const userName = profile?.full_name || 'User';
+
   return (
     <div className="min-h-screen bg-background pb-28">
       {/* Header */}
@@ -45,20 +68,23 @@ const Profile = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <button className="px-4 py-2 rounded-full bg-primary-foreground/20 text-sm font-medium backdrop-blur-sm">
-              Edit Profile
+            <button 
+              onClick={() => navigate('/change-password')}
+              className="px-4 py-2 rounded-full bg-primary-foreground/20 text-sm font-medium backdrop-blur-sm"
+            >
+              Change Password
             </button>
           </div>
 
           <div className="flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-full bg-primary-foreground/30 border-4 border-primary-foreground/50 flex items-center justify-center text-3xl font-bold mb-3">
-              {mockUser.name.charAt(0)}
+              {userName.charAt(0)}
             </div>
             <div className="flex items-center gap-1.5 mb-1">
-              <h2 className="text-xl font-bold">{mockUser.name}</h2>
+              <h2 className="text-xl font-bold">{userName}</h2>
               <CheckCircle2 className="w-5 h-5 fill-primary-foreground" />
             </div>
-            <p className="text-sm text-primary-foreground/80">Marriott · Bonvoy · {mockUser.membershipTier}</p>
+            <p className="text-sm text-primary-foreground/80">Loyalty · {getTier(points)} Member</p>
           </div>
         </div>
       </header>
@@ -68,15 +94,15 @@ const Profile = () => {
         <div className="bg-card rounded-2xl p-4 shadow-float border border-border">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-foreground">12</p>
-              <p className="text-xs text-muted-foreground">Stays</p>
+              <p className="text-2xl font-bold text-foreground">{transactions.filter(t => t.type === 'earn').length}</p>
+              <p className="text-xs text-muted-foreground">Visits</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">28</p>
-              <p className="text-xs text-muted-foreground">Nights</p>
+              <p className="text-2xl font-bold text-foreground">{transactions.length}</p>
+              <p className="text-xs text-muted-foreground">Trans</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-primary">{mockUser.totalPoints.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-primary">{points.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">Points</p>
             </div>
           </div>
@@ -103,10 +129,7 @@ const Profile = () => {
       {/* Suggested Section */}
       <section className="px-4 mt-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-foreground">Suggested</h3>
-          <button className="text-muted-foreground">
-            <span className="text-lg">•••</span>
-          </button>
+          <h3 className="font-semibold text-foreground">Settings</h3>
         </div>
         
         <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
