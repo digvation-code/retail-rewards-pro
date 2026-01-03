@@ -1,10 +1,22 @@
 import { Crown, ChevronRight, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { mockUser } from '@/data/mockData';
 import { Progress } from '@/components/ui/progress';
 
-const PointsCard = () => {
-  const progressPercentage = ((mockUser.totalPoints) / (mockUser.totalPoints + mockUser.pointsToNextTier)) * 100;
+interface PointsCardProps {
+  points?: number;
+}
+
+const PointsCard = ({ points = 0 }: PointsCardProps) => {
+  const nextTierPoints = 5000;
+  const pointsToNext = Math.max(0, nextTierPoints - points);
+  const progressPercentage = Math.min(100, (points / nextTierPoints) * 100);
+  
+  const getTier = (pts: number) => {
+    if (pts >= 10000) return 'Platinum';
+    if (pts >= 5000) return 'Gold';
+    if (pts >= 2000) return 'Silver';
+    return 'Bronze';
+  };
 
   return (
     <div className="bg-card rounded-2xl p-5 shadow-card border border-border animate-fade-in">
@@ -15,7 +27,7 @@ const PointsCard = () => {
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Membership</p>
-            <p className="font-semibold text-sm text-foreground">{mockUser.membershipTier}</p>
+            <p className="font-semibold text-sm text-foreground">{getTier(points)}</p>
           </div>
         </div>
         <button className="text-xs text-primary font-medium flex items-center gap-0.5 hover:underline">
@@ -26,15 +38,15 @@ const PointsCard = () => {
       <div className="bg-gradient-hero rounded-xl p-4 text-primary-foreground mb-4">
         <p className="text-primary-foreground/80 text-xs mb-1">Total Points</p>
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold">{mockUser.totalPoints.toLocaleString()}</span>
+          <span className="text-3xl font-bold">{points.toLocaleString()}</span>
           <span className="text-sm opacity-80">pts</span>
         </div>
       </div>
 
       <div className="mb-4">
         <div className="flex justify-between text-xs mb-2">
-          <span className="text-muted-foreground">Progress to Platinum</span>
-          <span className="font-medium text-foreground">{mockUser.pointsToNextTier} pts left</span>
+          <span className="text-muted-foreground">Progress to {getTier(points) === 'Bronze' ? 'Silver' : getTier(points) === 'Silver' ? 'Gold' : 'Platinum'}</span>
+          <span className="font-medium text-foreground">{pointsToNext.toLocaleString()} pts left</span>
         </div>
         <Progress 
           value={progressPercentage} 

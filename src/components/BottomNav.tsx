@@ -16,7 +16,7 @@ const BottomNav = ({ onQrClick }: BottomNavProps) => {
   ];
 
   const rightNavItems = [
-    { icon: ShoppingBag, label: 'Catalog', path: '/chat' },
+    { icon: ShoppingBag, label: 'Catalog', path: '/catalog' },
     { icon: User, label: 'Profile', path: '/profile' },
   ];
 

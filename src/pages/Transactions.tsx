@@ -1,27 +1,28 @@
 import { useState } from 'react';
 import { ArrowLeft, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import TransactionCard from '@/components/TransactionCard';
-import TransactionDetailModal from '@/components/TransactionDetailModal';
-import { mockTransactions, mockUser } from '@/data/mockData';
-import { Transaction } from '@/types/loyalty';
+import { useProfile } from '@/hooks/useProfile';
+import { useTransactions } from '@/hooks/useTransactions';
 import { Input } from '@/components/ui/input';
+import { formatDistanceToNow } from 'date-fns';
 
 const Transactions = () => {
   const navigate = useNavigate();
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const { profile } = useProfile();
+  const { transactions, loading } = useTransactions();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
 
-  const categories = ['all', 'food', 'shopping', 'grocery', 'entertainment'];
+  const types = ['all', 'earn', 'redeem'];
 
-  const filteredTransactions = mockTransactions.filter((transaction) => {
-    const matchesSearch = transaction.merchantName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || transaction.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+  const filteredTransactions = transactions.filter((transaction) => {
+    const matchesSearch = transaction.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = selectedType === 'all' || transaction.type === selectedType;
+    return matchesSearch && matchesType;
   });
 
-  const totalPointsEarned = mockTransactions.reduce((sum, t) => sum + t.pointsEarned, 0);
+  const totalEarned = transactions.filter(t => t.type === 'earn').reduce((sum, t) => sum + t.points, 0);
+  const totalRedeemed = transactions.filter(t => t.type === 'redeem').reduce((sum, t) => sum + Math.abs(t.points), 0);
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -38,7 +39,7 @@ const Transactions = () => {
             <h1 className="text-lg font-semibold text-foreground">Transaction History</h1>
           </div>
           <div className="flex items-center gap-1.5 bg-accent rounded-full px-3 py-1.5">
-            <span className="text-sm font-bold text-primary">{mockUser.totalPoints.toLocaleString()}</span>
+            <span className="text-sm font-bold text-primary">{(profile?.points_balance || 0).toLocaleString()}</span>
             <span className="text-xs text-muted-foreground">pts</span>
           </div>
         </div>
@@ -56,19 +57,19 @@ const Transactions = () => {
           </div>
         </div>
 
-        {/* Category Filter */}
+        {/* Type Filter */}
         <div className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
-          {categories.map((category) => (
+          {types.map((type) => (
             <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
+              key={type}
+              onClick={() => setSelectedType(type)}
               className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                selectedCategory === category
+                selectedType === type
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'bg-muted text-muted-foreground hover:bg-accent'
               }`}
             >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
+              {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
@@ -78,12 +79,12 @@ const Transactions = () => {
       <div className="p-4">
         <div className="bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-card">
           <div>
-            <p className="text-xs text-muted-foreground">Total Points Earned</p>
-            <p className="text-xl font-bold text-success">+{totalPointsEarned} pts</p>
+            <p className="text-xs text-muted-foreground">Total Earned</p>
+            <p className="text-xl font-bold text-success">+{totalEarned} pts</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-muted-foreground">Transactions</p>
-            <p className="text-xl font-bold text-foreground">{mockTransactions.length}</p>
+            <p className="text-xs text-muted-foreground">Total Redeemed</p>
+            <p className="text-xl font-bold text-destructive">-{totalRedeemed} pts</p>
           </div>
         </div>
       </div>
@@ -94,31 +95,45 @@ const Transactions = () => {
           {filteredTransactions.length} transactions
         </h2>
         <div className="space-y-3">
-          {filteredTransactions.map((transaction, index) => (
-            <div 
-              key={transaction.id}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <TransactionCard 
-                transaction={transaction}
-                onClick={() => setSelectedTransaction(transaction)}
-              />
+          {loading ? (
+            <div className="text-center py-10">
+              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto" />
             </div>
-          ))}
-          
-          {filteredTransactions.length === 0 && (
+          ) : filteredTransactions.length > 0 ? (
+            filteredTransactions.map((transaction) => (
+              <div 
+                key={transaction.id}
+                className="bg-card rounded-xl p-4 border border-border shadow-card"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      transaction.type === 'earn' ? 'bg-success/10' : 'bg-destructive/10'
+                    }`}>
+                      <span className="text-lg">{transaction.type === 'earn' ? '💰' : '🎁'}</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{transaction.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(transaction.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                  <p className={`font-bold text-sm ${
+                    transaction.type === 'earn' ? 'text-success' : 'text-destructive'
+                  }`}>
+                    {transaction.type === 'earn' ? '+' : ''}{transaction.points} pts
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
             <div className="text-center py-10 bg-card rounded-xl border border-border">
               <p className="text-muted-foreground text-sm">No transactions found</p>
             </div>
           )}
         </div>
       </section>
-
-      <TransactionDetailModal
-        transaction={selectedTransaction}
-        isOpen={!!selectedTransaction}
-        onClose={() => setSelectedTransaction(null)}
-      />
     </div>
   );
 };

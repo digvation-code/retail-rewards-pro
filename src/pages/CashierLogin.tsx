@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Loader2 } from 'lucide-react';
+import { UserCog, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
@@ -14,12 +14,11 @@ const loginSchema = z.object({
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
-const Login = () => {
+const CashierLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -39,19 +38,45 @@ const Login = () => {
     }
 
     setIsLoading(true);
-    const { error } = await signIn(email, password);
-    setIsLoading(false);
 
-    if (error) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      // Check if user has cashier or admin role
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .in('role', ['cashier', 'admin']);
+
+      if (roleError) throw roleError;
+
+      if (!roleData || roleData.length === 0) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Access Denied",
+          description: "You don't have cashier privileges.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      navigate('/cashier');
+    } catch (error: any) {
       toast({
         title: "Login Failed",
         description: error.message === 'Invalid login credentials' 
-          ? "Invalid email or password. Please try again."
+          ? "Invalid email or password."
           : error.message,
         variant: "destructive",
       });
-    } else {
-      navigate('/');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,12 +84,12 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md border border-border shadow-float">
         <CardHeader className="text-center space-y-4 pb-2">
-          <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
-            <Award className="w-8 h-8 text-primary" />
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+            <UserCog className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Cashier Portal</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Sign in to access your loyalty rewards
+            Sign in to manage customer accounts
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
@@ -114,10 +139,10 @@ const Login = () => {
           </form>
           <div className="mt-4 text-center">
             <button 
-              onClick={() => window.location.href = '/cashier-login'}
+              onClick={() => navigate('/login')}
               className="text-sm text-muted-foreground hover:text-primary"
             >
-              Cashier Portal →
+              ← Back to customer login
             </button>
           </div>
         </CardContent>
@@ -126,4 +151,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default CashierLogin;
